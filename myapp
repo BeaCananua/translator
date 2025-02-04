@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:translator/translator.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Translator',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: TranslatorScreen(),
+    );
+  }
+}
+
+class TranslatorScreen extends StatefulWidget {
+  @override
+  _TranslatorScreenState createState() => _TranslatorScreenState();
+}
+
+class _TranslatorScreenState extends State<TranslatorScreen> {
+  final TextEditingController _textController = TextEditingController();
+  final GoogleTranslator _translator = GoogleTranslator();
+  String _translatedText = "Translation will appear here";
+  String _selectedLanguage = 'es'; // Default to Spanish
+
+  final Map<String, String> _languages = {
+    'Spanish': 'es',
+    'French': 'fr',
+    'German': 'de',
+    'Chinese': 'zh-cn',
+    'Hindi': 'hi',
+    'English': 'en',
+    'Korean': 'ko',
+    'Thailand': 'thai',
+    'Filipino': 'fil',
+  };
+
+  void _translateText() async {
+    if (_textController.text.isEmpty) return;
+    var translation = await _translator.translate(_textController.text, to: _selectedLanguage);
+    setState(() {
+      _translatedText = translation.text;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Flutter Translator')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                labelText: 'Enter text',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedLanguage,
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedLanguage = newValue!;
+                });
+              },
+              items: _languages.entries.map((entry) {
+                return DropdownMenuItem<String>(
+                  value: entry.value,
+                  child: Text(entry.key),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                labelText: 'Select Language',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _translateText,
+              child: Text('Translate'),
+            ),
+            SizedBox(height: 16),
+            Text(
+              _translatedText,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
